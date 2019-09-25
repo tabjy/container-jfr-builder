@@ -1,6 +1,6 @@
 # Containfer JFR Builder Image
 
-Builder image for [openshift/source-to-image](https://github.com/openshift/source-to-image) to build [container-jfr](https://github.com/rh-jmc-team/container-jfr).
+Builder image for [openshift/source-to-image](https://github.com/openshift/source-to-image) to build [container-jfr](https://github.com/rh-jmc-team/container-jfr). Related to [rh-jmc-team/container-jfr#1](https://github.com/rh-jmc-team/container-jfr/issues/1).
 
 ## Usage
 
@@ -11,7 +11,7 @@ Builder image for [openshift/source-to-image](https://github.com/openshift/sourc
 
 2. Build the builder image:
     ```
-    docker build -t tabjy/container-jfr-builder builder
+    docker build -t tabjy/container-jfr-builder container-jfr-builder
     ```
     Yes, you have to do this step. This image is not published.
 
@@ -22,7 +22,7 @@ Builder image for [openshift/source-to-image](https://github.com/openshift/sourc
     This might take quite a while, as it's going to build JMC, container-jfr-core, and container-jfr-web, too.
 4. Run your application container:
     ```
-    docker run -it --rm -it tabjy/container-jfr
+    docker run -it --rm -it rh-jmc-team/container-jfr
     ```
     Web interface available on [http://localhost:8181](http://localhost:8181).
 
