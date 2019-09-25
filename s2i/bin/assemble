@@ -1,0 +1,46 @@
+#!/bin/bash -e
+
+# debug
+pushd /tmp
+
+git clone https://github.com/openjdk/jmc.git
+git clone https://github.com/rh-jmc-team/container-jfr-core.git
+
+pushd jmc
+
+pushd releng/third-party
+mvn p2:site
+mvn jetty:run & # needs to be killed
+popd
+
+pushd core
+mvn install -DskipTests=true -Dspotbugs.skip=true
+popd
+
+mvn install -DskipTests=true -Dspotbugs.skip=true
+popd
+
+pushd container-jfr-core
+./gradlew build
+popd
+
+pushd src
+
+./gradlew build
+
+
+pushd web-client
+npm install
+popd
+
+./gradlew copyWebClient
+
+tar xf ./build/distributions/container-jfr.tar
+mv ./container-jfr /
+mv ./build/extra-directory/web-client /web-client
+
+popd
+
+rm -rf src jmc container-jfr-core
+
+popd

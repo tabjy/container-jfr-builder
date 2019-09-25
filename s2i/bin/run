@@ -1,0 +1,4 @@
+#!/bin/bash -e
+
+JAVA_OPTS="-Dcom.sun.management.jmxremote.port=9091 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false"
+/container-jfr/bin/container-jfr
