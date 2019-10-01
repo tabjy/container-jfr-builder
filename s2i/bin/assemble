@@ -1,8 +1,10 @@
 #!/bin/bash -e
 
-# debug
-pushd /tmp
+set -x # enable echo
 
+pushd src
+
+mv /tmp/src container-jfr
 git clone https://github.com/openjdk/jmc.git
 git clone https://github.com/rh-jmc-team/container-jfr-core.git
 
@@ -10,7 +12,7 @@ pushd jmc
 
 pushd releng/third-party
 mvn p2:site
-mvn jetty:run & # needs to be killed
+mvn jetty:run &
 popd
 
 pushd core
@@ -18,16 +20,15 @@ mvn install -DskipTests=true -Dspotbugs.skip=true
 popd
 
 mvn install -DskipTests=true -Dspotbugs.skip=true
+kill $!
 popd
 
 pushd container-jfr-core
-./gradlew build
+./gradlew build -x test 
 popd
 
-pushd src
-
-./gradlew build
-
+pushd container-jfr
+./gradlew build -x test 
 
 pushd web-client
 npm install
@@ -35,12 +36,16 @@ popd
 
 ./gradlew copyWebClient
 
+#mkdir -p ./build/distributions/
+#curl localhost:8000/container-jfr.tar -o ./build/distributions/container-jfr.tar
+
 tar xf ./build/distributions/container-jfr.tar
-mv ./container-jfr /
-mv ./build/extra-directory/web-client /web-client
+mv ./container-jfr/bin/* ${APP_ROOT}/bin/
+mv ./container-jfr/lib/* ${APP_ROOT}/lib/
+mv ./build/extra-directory/web-client ${APP_ROOT}/lib/web-client
 
 popd
 
-rm -rf src jmc container-jfr-core
-
 popd
+
+rm -rf src/*

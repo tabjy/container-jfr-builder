@@ -1,14 +1,33 @@
 FROM registry.access.redhat.com/ubi8/ubi
 
-RUN yum install -y git npm maven java-11-openjdk-devel && \
-    yum clean all && \
-    alternatives --config java <<< 2 && \
-    alternatives --config javac <<< 2
+RUN INSTALL_PKGS="git npm maven java-11-openjdk-devel" && \
+    yum install -y $INSTALL_PKGS && \
+    yum clean all -y && \
+    # configure to use java 11 by default
+    alternatives --config java > /dev/null <<< 2 && \
+    alternatives --config javac > /dev/null <<< 2
 
-COPY ./s2i/bin/* /usr/libexec/s2i/
+ENV S2I_ROOT=/usr/libexec/s2i
+ENV APP_ROOT=/opt/app-root
+ENV PATH=${APP_ROOT}/bin:${PATH}
+ENV HOME=${APP_ROOT}
 
-RUN chmod +x /usr/libexec/s2i/*
+RUN mkdir -p ${APP_ROOT} ${APP_ROOT}/src ${APP_ROOT}/bin ${APP_ROOT}/lib
+# we don't have permisson to create such a symbolic link in assmeble
+RUN ln -sf ${APP_ROOT}/lib/web-client /web-client 
 
-LABEL io.openshift.s2i.scripts-url="image:///usr/libexec/s2i"
+COPY ./s2i/bin/ ${S2I_ROOT}
+
+RUN chmod +x ${S2I_ROOT}/* && \
+    chmod -R u+x ${APP_ROOT}/bin && \
+    chgrp -R 0 ${APP_ROOT} && \
+    chmod -R g=u ${APP_ROOT} && \
+    chmod -R g=u /etc/passwd
+
+ENTRYPOINT [ "/usr/libexec/s2i/uid_entrypoint" ]
 
 USER 10001
+
+WORKDIR ${APP_ROOT}
+
+LABEL io.openshift.s2i.scripts-url="image:///usr/libexec/s2i"
