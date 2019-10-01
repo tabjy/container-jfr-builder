@@ -1,4 +1,4 @@
-# Containfer JFR Builder Image
+# Container JFR Builder Image
 
 Builder image for [openshift/source-to-image](https://github.com/openshift/source-to-image) to build [container-jfr](https://github.com/rh-jmc-team/container-jfr). Related to [rh-jmc-team/container-jfr#1](https://github.com/rh-jmc-team/container-jfr/issues/1).
 
@@ -30,3 +30,5 @@ Builder image for [openshift/source-to-image](https://github.com/openshift/sourc
 ## TODOs
 - cache for maven, gradle, npm 
 - use pipelined build to reduce final image size
+- explicitly set the alternatives paths for Java
+- support shallow cloning and specifying a commit hash or release tag for JMC and container-jfr-core
