@@ -2,6 +2,28 @@
 
 set -x # enable echo
 
+# restore build artifacts
+DIRS=""
+
+# restore maven cache (if exists)
+if [ -d /tmp/artifacts/.m2 ]; then
+    DIRS="/tmp/artifacts/.m2 $DIRS"
+fi
+
+# restore gradle cache (if exists)
+if [ -d /tmp/artifacts/.gradle ]; then
+    DIRS="/tmp/artifacts/.gradle $DIRS"
+fi
+
+# restore npm cache (if exists)
+if [ -d /tmp/artifacts/.npm ]; then
+    DIRS="/tmp/artifacts/.npm $DIRS"
+fi
+
+if [ -n "$DIRS" ]; then
+    mv $DIRS $HOME
+fi
+
 pushd src
 
 mv /tmp/src container-jfr

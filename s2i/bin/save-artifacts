@@ -1,0 +1,22 @@
+#!/bin/bash
+
+DIRS=""
+
+# save maven cache (if exists)
+if [ -d .m2 ]; then
+    DIRS=".m2 $DIRS"
+fi
+
+# save gradle cache (if exists)
+if [ -d .gradle ]; then
+    DIRS=".gradle $DIRS"
+fi
+
+# save npm cache (if exists)
+if [ -d .npm ]; then
+    DIRS=".npm $DIRS"
+fi
+
+if [ -n "$DIRS" ]; then
+    tar cf - $DIRS
+fi

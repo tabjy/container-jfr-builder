@@ -20,6 +20,8 @@ Builder image for [openshift/source-to-image](https://github.com/openshift/sourc
     s2i build https://github.com/rh-jmc-team/container-jfr.git tabjy/container-jfr-builder rh-jmc-team/container-jfr
     ```
     This might take quite a while, as it's going to build JMC, container-jfr-core, and container-jfr-web, too.
+
+    Optionally, add `--incremental=true` flag to reuse Maven, Gradle and NPM cache from the last build.
 4. Run your application container:
     ```
     docker run -it --rm -it rh-jmc-team/container-jfr
@@ -28,7 +30,6 @@ Builder image for [openshift/source-to-image](https://github.com/openshift/sourc
 
 
 ## TODOs
-- cache for maven, gradle, npm 
 - use pipelined build to reduce final image size
 - explicitly set the alternatives paths for Java
 - support shallow cloning and specifying a commit hash or release tag for JMC and container-jfr-core
