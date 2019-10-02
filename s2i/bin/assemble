@@ -27,8 +27,15 @@ fi
 pushd src
 
 mv /tmp/src container-jfr
-git clone https://github.com/openjdk/jmc.git
-git clone https://github.com/rh-jmc-team/container-jfr-core.git
+
+# jmc repo is not tagged
+git clone --depth 1 https://github.com/openjdk/jmc.git
+
+CLONE_OPTS=""
+if [ -n "$CONTAINER_JMC_CORE_BRANCH" ]; then
+    CLONE_OPTS="--branch $CONTAINER_JMC_CORE_BRANCH $CLONE_OPTS"
+fi
+git clone ${CLONE_OPTS} --depth 1 https://github.com/rh-jmc-team/container-jfr-core.git
 
 pushd jmc
 
