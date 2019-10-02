@@ -2,10 +2,16 @@ FROM registry.access.redhat.com/ubi8/ubi
 
 RUN INSTALL_PKGS="git npm maven java-11-openjdk-devel" && \
     yum install -y $INSTALL_PKGS && \
-    yum clean all -y && \
-    # configure to use java 11 by default
-    alternatives --config java > /dev/null <<< 2 && \
-    alternatives --config javac > /dev/null <<< 2
+    rpm -V $INSTALL_PKGS && \
+    yum clean all -y
+   
+# configure to use java 11 by default
+RUN alternatives --install /usr/bin/java java /usr/lib/jvm/java-11-openjdk/bin/java 0 && \
+    alternatives --install /usr/bin/javac javac /usr/lib/jvm/java-11-openjdk/bin/javac 0 && \
+    alternatives --set java /usr/lib/jvm/java-11-openjdk/bin/java && \
+    alternatives --set javac /usr/lib/jvm/java-11-openjdk/bin/javac
+
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk
 
 ENV S2I_ROOT=/usr/libexec/s2i
 ENV APP_ROOT=/opt/app-root

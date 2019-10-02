@@ -31,5 +31,4 @@ Builder image for [openshift/source-to-image](https://github.com/openshift/sourc
 
 ## TODOs
 - use pipelined build to reduce final image size
-- explicitly set the alternatives paths for Java
 - support shallow cloning and specifying a commit hash or release tag for JMC and container-jfr-core
