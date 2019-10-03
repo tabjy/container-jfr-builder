@@ -2,79 +2,118 @@
 
 set -x # enable echo
 
-# restore build artifacts
-DIRS=""
+restore_artifacts() {
+    pushd $HOME
 
-# restore maven cache (if exists)
-if [ -d /tmp/artifacts/.m2 ]; then
-    DIRS="/tmp/artifacts/.m2 $DIRS"
-fi
+    # restore build artifacts
+    DIRS=""
 
-# restore gradle cache (if exists)
-if [ -d /tmp/artifacts/.gradle ]; then
-    DIRS="/tmp/artifacts/.gradle $DIRS"
-fi
+    # restore maven cache (if exists)
+    if [ -d /tmp/artifacts/.m2 ]; then
+        DIRS="/tmp/artifacts/.m2 $DIRS"
+    fi
 
-# restore npm cache (if exists)
-if [ -d /tmp/artifacts/.npm ]; then
-    DIRS="/tmp/artifacts/.npm $DIRS"
-fi
+    # restore gradle cache (if exists)
+    if [ -d /tmp/artifacts/.gradle ]; then
+        DIRS="/tmp/artifacts/.gradle $DIRS"
+    fi
 
-if [ -n "$DIRS" ]; then
-    mv $DIRS $HOME
-fi
+    # restore npm cache (if exists)
+    if [ -d /tmp/artifacts/.npm ]; then
+        DIRS="/tmp/artifacts/.npm $DIRS"
+    fi
 
-pushd src
+    if [ -n "$DIRS" ]; then
+        mv $DIRS $HOME
+    fi
 
-mv /tmp/src container-jfr
+    popd
+}
 
-# jmc repo is not tagged
-git clone --depth 1 https://github.com/openjdk/jmc.git
+build_jmc() {
+    echo Building JMC
+    pushd $HOME/src/
 
-CLONE_OPTS=""
-if [ -n "$CONTAINER_JMC_CORE_BRANCH" ]; then
-    CLONE_OPTS="--branch $CONTAINER_JMC_CORE_BRANCH $CLONE_OPTS"
-fi
-git clone ${CLONE_OPTS} --depth 1 https://github.com/rh-jmc-team/container-jfr-core.git
+    # jmc repo is not tagged
+    git clone --depth 1 https://github.com/openjdk/jmc.git
 
-pushd jmc
+    pushd jmc
 
-pushd releng/third-party
-mvn p2:site
-mvn jetty:run &
-popd
+    pushd releng/third-party
+    mvn p2:site
+    mvn jetty:run &
+    popd
 
-pushd core
-mvn install -DskipTests=true -Dspotbugs.skip=true
-popd
+    pushd core
+    mvn install -DskipTests=true -Dspotbugs.skip=true
+    popd
 
-mvn install -DskipTests=true -Dspotbugs.skip=true
-kill $!
-popd
+    mvn install -DskipTests=true -Dspotbugs.skip=true
+    kill $!
+    popd
 
-pushd container-jfr-core
-./gradlew build -x test 
-popd
+    popd
+}
 
-pushd container-jfr
-./gradlew build -x test 
+build_container_jfr_core() {
+    echo Building container_jfr_core
+    pushd $HOME/src/
 
-pushd web-client
-npm install
-popd
+    CLONE_OPTS=""
+    if [ -n "$CONTAINER_JMC_CORE_BRANCH" ]; then
+        CLONE_OPTS="--branch $CONTAINER_JMC_CORE_BRANCH $CLONE_OPTS"
+    fi
+    git clone ${CLONE_OPTS} --depth 1 https://github.com/rh-jmc-team/container-jfr-core.git
+    
+    pushd container-jfr-core
 
-./gradlew copyWebClient
+    if [ -n "$(./gradlew dependencyInsight --dependency org.openjdk.jmc | grep FAILED)" ]; then
+        echo Unable to resolve JMC artifacts
+        build_jmc
+    fi
 
-#mkdir -p ./build/distributions/
-#curl localhost:8000/container-jfr.tar -o ./build/distributions/container-jfr.tar
+    ./gradlew build -x test 
+    
+    popd
 
-tar xf ./build/distributions/container-jfr.tar
-mv ./container-jfr/bin/* ${APP_ROOT}/bin/
-mv ./container-jfr/lib/* ${APP_ROOT}/lib/
-mv ./build/extra-directory/web-client ${APP_ROOT}/lib/web-client
+    popd
+}
 
-popd
+build_container_jfr() {
+    echo Building container-jf
+    pushd $HOME/src/container-jfr
 
-popd
+    if [ -n "$(./gradlew dependencyInsight --dependency containerjfr-core | grep FAILED)" ]; then
+        echo Unable to resolve containerjfr-core artifact
+        build_container_jfr_core
+    fi
+
+    pushd web-client
+    npm install
+    popd
+
+    ./gradlew build -x test
+    ./gradlew copyWebClient
+    
+    popd
+}
+
+copy_output() {
+    pushd $HOME/src/container-jfr
+    tar xf ./build/distributions/container-jfr.tar
+    mv ./container-jfr/bin/* ${APP_ROOT}/bin/
+    mv ./container-jfr/lib/* ${APP_ROOT}/lib/
+    mv ./build/extra-directory/web-client ${APP_ROOT}/lib/web-client
+    popd
+}
+
+pushd $HOME
+restore_artifacts
+
+mv /tmp/src src/container-jfr
+
+build_container_jfr
+copy_output
 
 rm -rf src/*
+popd
