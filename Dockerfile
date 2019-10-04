@@ -1,6 +1,6 @@
 FROM registry.access.redhat.com/ubi8/ubi
 
-RUN INSTALL_PKGS="git npm maven java-11-openjdk-devel" && \
+RUN INSTALL_PKGS="npm maven java-11-openjdk-devel" && \
     yum install -y $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     yum clean all -y

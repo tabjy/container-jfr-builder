@@ -34,8 +34,9 @@ build_jmc() {
     echo Building JMC
     pushd $HOME/src/
 
-    # jmc repo is not tagged
-    git clone --depth 1 https://github.com/openjdk/jmc.git
+    JMC_REVISION=${JMC_REVISION:-master}
+    curl https://codeload.github.com/openjdk/jmc/legacy.tar.gz/${JMC_REVISION} | tar xz
+    mv openjdk-jmc-* jmc
 
     pushd jmc
 
@@ -59,11 +60,9 @@ build_container_jfr_core() {
     echo Building container_jfr_core
     pushd $HOME/src/
 
-    CLONE_OPTS=""
-    if [ -n "$CONTAINER_JMC_CORE_BRANCH" ]; then
-        CLONE_OPTS="--branch $CONTAINER_JMC_CORE_BRANCH $CLONE_OPTS"
-    fi
-    git clone ${CLONE_OPTS} --depth 1 https://github.com/rh-jmc-team/container-jfr-core.git
+    CONTAINER_JMC_CORE_REVISION=${CONTAINER_JMC_CORE_REVISION:-master}
+    curl https://codeload.github.com/rh-jmc-team/container-jfr-core/legacy.tar.gz/${CONTAINER_JMC_CORE_REVISION} | tar xz
+    mv rh-jmc-team-container-jfr-core-* container-jfr-core
     
     pushd container-jfr-core
 
