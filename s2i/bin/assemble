@@ -34,8 +34,8 @@ build_jmc() {
     echo Building JMC
     pushd $HOME/src/
 
-    JMC_REVISION=${JMC_REVISION:-master}
-    curl https://codeload.github.com/openjdk/jmc/legacy.tar.gz/${JMC_REVISION} | tar xz
+    JMC_REF=${JMC_REF:-master}
+    curl https://codeload.github.com/openjdk/jmc/legacy.tar.gz/${JMC_REF} | tar xz
     mv openjdk-jmc-* jmc
 
     pushd jmc
@@ -60,8 +60,8 @@ build_container_jfr_core() {
     echo Building container_jfr_core
     pushd $HOME/src/
 
-    CONTAINER_JMC_CORE_REVISION=${CONTAINER_JMC_CORE_REVISION:-master}
-    curl https://codeload.github.com/rh-jmc-team/container-jfr-core/legacy.tar.gz/${CONTAINER_JMC_CORE_REVISION} | tar xz
+    CONTAINER_JMC_CORE_REF=${CONTAINER_JMC_CORE_REF:-master}
+    curl https://codeload.github.com/rh-jmc-team/container-jfr-core/legacy.tar.gz/${CONTAINER_JMC_CORE_REF} | tar xz
     mv rh-jmc-team-container-jfr-core-* container-jfr-core
     
     pushd container-jfr-core
