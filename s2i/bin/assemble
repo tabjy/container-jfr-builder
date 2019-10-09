@@ -23,6 +23,14 @@ restore_artifacts() {
         DIRS="/tmp/artifacts/.npm $DIRS"
     fi
 
+    if [ -d /tmp/artifacts/src/container-jfr/web-client/dist ]; then
+        DIRS="/tmp/artifacts/src/container-jfr/web-client/dist $DIRS"
+    fi
+    
+    if [ -d /tmp/artifacts/src/container-jfr/web-client/node_modules ]; then
+        DIRS="/tmp/artifacts/src/container-jfr/web-client/node_modules $DIRS"
+    fi
+
     if [ -n "$DIRS" ]; then
         mv $DIRS $HOME
     fi
@@ -71,7 +79,7 @@ build_container_jfr_core() {
         build_jmc
     fi
 
-    ./gradlew build -x test 
+    ./gradlew build -x test -x spotbugsMain
 
     popd
 
@@ -105,12 +113,12 @@ copy_output() {
 }
 
 pushd $HOME
-restore_artifacts
-
 mv /tmp/src src/container-jfr
 
+restore_artifacts
+
 build_container_jfr
+
 copy_output
 
-rm -rf src/*
 popd

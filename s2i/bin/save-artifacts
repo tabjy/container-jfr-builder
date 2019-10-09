@@ -17,6 +17,14 @@ if [ -d .npm ]; then
     DIRS=".npm $DIRS"
 fi
 
+if [ -d src/container-jfr/web-client/dist ]; then
+    DIRS="src/container-jfr/web-client/dist $DIRS"
+fi
+
+if [ -d src/container-jfr/web-client/node_modules ]; then
+    DIRS="src/container-jfr/web-client/node_modules $DIRS"
+fi
+
 if [ -n "$DIRS" ]; then
     tar cf - $DIRS
 fi
