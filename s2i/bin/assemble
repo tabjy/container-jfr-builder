@@ -72,7 +72,7 @@ build_container_jfr_core() {
     fi
 
     ./gradlew build -x test 
-    
+
     popd
 
     popd
@@ -91,9 +91,8 @@ build_container_jfr() {
     npm install
     popd
 
-    ./gradlew build -x test
-    ./gradlew copyWebClient
-    
+    ./gradlew distTar -x test -x spotbugsMain
+
     popd
 }
 
@@ -102,7 +101,6 @@ copy_output() {
     tar xf ./build/distributions/container-jfr.tar
     mv ./container-jfr/bin/* ${APP_ROOT}/bin/
     mv ./container-jfr/lib/* ${APP_ROOT}/lib/
-    mv ./build/extra-directory/web-client ${APP_ROOT}/lib/web-client
     popd
 }
 
