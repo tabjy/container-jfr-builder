@@ -28,6 +28,10 @@ Builder image for [openshift/source-to-image](https://github.com/openshift/sourc
     ```
     Web interface available on [http://localhost:8181](http://localhost:8181).
 
+5. *Optionally*, generate a more slim, runtime-only, image:
+    ```
+    docker build -t rh-jmc-team/container-jfr-runtime -f container-jfr-builder/runtime.Dockerfile container-jfr-builder
+    ```
 
 ## TODOs
 - use pipelined build to reduce final image size
