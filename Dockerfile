@@ -22,6 +22,17 @@ RUN mkdir -p ${APP_ROOT} ${APP_ROOT}/src ${APP_ROOT}/bin ${APP_ROOT}/lib
 # we don't have permisson to create such a symbolic link in assmeble
 RUN ln -sf ${APP_ROOT}/lib/web-client /web-client 
 
+ARG NPM_REGISTRY
+ARG NPM_CA_FILE
+
+RUN if [[ -n "$NPM_REGISTRY" ]]; then \
+        echo "registry=$NPM_REGISTRY" >> $HOME/.npmrc; \
+    fi
+
+RUN if [[ -n "$NPM_CA_FILE" ]]; then \
+        curl $NPM_CA_FILE -o $HOME/.npm-ca.cert && echo "cafile=$HOME/.npm-ca.cert" >> $HOME/.npmrc; \
+    fi
+
 COPY ./s2i/bin/ ${S2I_ROOT}
 
 RUN chmod +x ${S2I_ROOT}/* && \
