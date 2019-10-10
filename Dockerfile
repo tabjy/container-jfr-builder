@@ -19,8 +19,6 @@ ENV PATH=${APP_ROOT}/bin:${PATH}
 ENV HOME=${APP_ROOT}
 
 RUN mkdir -p ${APP_ROOT} ${APP_ROOT}/src ${APP_ROOT}/bin ${APP_ROOT}/lib
-# we don't have permisson to create such a symbolic link in assmeble
-RUN ln -sf ${APP_ROOT}/lib/web-client /web-client 
 
 ARG NPM_REGISTRY
 ARG NPM_CA_FILE
