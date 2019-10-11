@@ -23,16 +23,16 @@ restore_artifacts() {
         DIRS="/tmp/artifacts/.npm $DIRS"
     fi
 
+    if [ -n "$DIRS" ]; then
+        mv $DIRS $HOME
+    fi
+
     if [ -d /tmp/artifacts/src/container-jfr/web-client/dist ]; then
-        DIRS="/tmp/artifacts/src/container-jfr/web-client/dist $DIRS"
+        mv /tmp/artifacts/src/container-jfr/web-client/dist $HOME/src/container-jfr/web-client/
     fi
     
     if [ -d /tmp/artifacts/src/container-jfr/web-client/node_modules ]; then
-        DIRS="/tmp/artifacts/src/container-jfr/web-client/node_modules $DIRS"
-    fi
-
-    if [ -n "$DIRS" ]; then
-        mv $DIRS $HOME
+        mv /tmp/artifacts/src/container-jfr/web-client/node_modules $HOME/src/container-jfr/web-client/
     fi
 
     popd
@@ -120,5 +120,16 @@ restore_artifacts
 build_container_jfr
 
 copy_output
+
+
+mkdir -p artifacts/.m2/repository/org/openjdk/jmc
+mkdir -p artifacts/src/container-jfr/web-client
+
+mv .gradle artifacts
+mv .m2/repository/org/openjdk/jmc artifacts/.m2/repository/org/openjdk/
+mv src/container-jfr/web-client/dist artifacts/src/container-jfr/web-client
+mv src/container-jfr/web-client/node_modules artifacts/src/container-jfr/web-client
+
+rm -rf src .npm .gradle .m2
 
 popd
